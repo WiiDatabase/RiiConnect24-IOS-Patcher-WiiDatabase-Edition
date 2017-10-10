@@ -1,7 +1,7 @@
 RiiConnect24 IOS Patcher WiiDatabase Edition
 ============================================
 
-An improved version of the [RiiConnect24 IOS Patcher](https://github.com/RiiConnect24/IOS-Patcher) by KcrPL and Larsenv. It *works*, but the code is a mess imho. May improve it someday.
+An improved version of the [RiiConnect24 IOS Patcher](https://github.com/RiiConnect24/IOS-Patcher) by KcrPL and Larsenv.
 
 ## Main changes:
 * Rewrote from scratch
@@ -11,7 +11,7 @@ An improved version of the [RiiConnect24 IOS Patcher](https://github.com/RiiConn
 
 ## Todo
 * [ ] Better download and patching code without [lotsa spaghetti](https://abload.de/img/hqdefaultj8s9a.jpg)
-* [ ] Check MD5 of patched files before downloading them
+* [X] Check MD5 of patched files before downloading them
 * [ ] Speaking of MD5, switch to a more secure algorithm
 
 ## Screenshots
