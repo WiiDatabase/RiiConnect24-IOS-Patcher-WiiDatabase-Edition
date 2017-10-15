@@ -3,7 +3,7 @@ SETLOCAL ENABLEDELAYEDEXPANSION
 :top
 CLS
 COLOR 1F
-set currentversion=v1.0.1
+set currentversion=v1.0.2
 set header=echo			RiiConnect24 IOS Patcher %currentversion% by WiiDatabase.de
 mode con cols=85 lines=30
 TITLE RiiConnect24 IOS Patcher %currentversion%
@@ -54,8 +54,8 @@ echo		[0] Exit
 echo.
 set /p islatest=	Input:	
 
-if /i "%islatest%" EQU "Y" (set ios31=*) && (set ios80=*) && (goto:downloadios)
-if /i "%islatest%" EQU "N" (set ios31=*) && (set ios80=) && (goto:downloadios)
+if /i "%islatest%" EQU "Y" (set ios31=*) && (set ios80=*) && (set nof=2) && (goto:downloadios)
+if /i "%islatest%" EQU "N" (set ios31=*) && (set ios80=) && (set nof=1) && (goto:downloadios)
 if /i "%islatest%" EQU "0" exit
 
 set false=1
@@ -66,6 +66,7 @@ CLS
 %header%
 echo.
 echo.
+set failed=0
 :setvariables
 set attempt=1
 if /i "%ios31%" EQU "*" goto:ios31
@@ -105,10 +106,11 @@ goto:startdownload
 
 
 :startdownload
-if /i "%attempt%" EQU "3" goto:failed
+if /i "%attempt%" EQU "4" goto:failed
 
 if /i "%attempt%" EQU "1" Support\sfk echo -spat \x20 \x20 [Magenta] Downloading %namedl%...
 if /i "%attempt%" NEQ "1" Support\sfk echo -spat \x20 \x20 [Magenta] Redownloading %namedl%...
+if /i "%existsbutinvalid%" EQU "*" (set /a attempt=%attempt%-1) && (set existsbutinvalid=)
 
 if not exist copy-to-device\%name%-patched.wad goto:notexistpatched
 :: Verify MD5, if patched WAD already exists
@@ -135,6 +137,7 @@ support\sfk echo -spat \x20 \x20  [Yellow] The current file will be deleted and 
 echo.
 
 set /a attempt=%attempt%+1
+set existsbutinvalid=*
 del tmp\%name%.wad >NUL
 if exist titles\%titleid% rmdir /s /q titles\%titleid%
 goto:startdownload
@@ -142,16 +145,15 @@ goto:startdownload
 :download
 :: Downloading base WAD
 start /min/wait Support\nusd.exe %titleid% %titleversion% packwad
-move /y titles\%titleid%\%titleversion%\%titleid%-NUS-v%titleversion%.wad tmp\%name%.wad >nul
+if exist titles\%titleid%\%titleversion%\%titleid%-NUS-v%titleversion%.wad move /y titles\%titleid%\%titleversion%\%titleid%-NUS-v%titleversion%.wad tmp\%name%.wad
 
 if exist titles\%titleid% rd /s /q titles\%titleid%
 if exist tmp\%name%.wad goto:checkdownload
-
 support\sfk echo -spat \x20 \x20  [Yellow] The file is missing, retrying download...
 echo.
 
 set /a attempt=%attempt%+1
-del tmp\%name%.wad >NUL
+if exist tmp\%name%.wad del tmp\%name%.wad
 goto:startdownload
 
 :checkdownload
@@ -193,13 +195,14 @@ goto:setvariables
 :: Patching of the base WAD failed
 if /i "%attempt%" EQU "1" Support\sfk echo -spat \x20 \x20 [Red] Patching failed, skipping...
 echo.
+set /a failed=%failed%+1
 set %variable%=
 goto:setvariables
 
 :failed
 :: Download of the base WAD failed mutiple times
-echo.
 support\sfk echo -spat \x20 \x20  [Red] This file failed to download multiple times, skipping...
+set /a failed=%failed%+1
 set %variable%=
 echo.
 goto:setvariables
@@ -208,10 +211,12 @@ goto:setvariables
 :: All downloads finished
 if exist titles rd /s /q titles
 echo.
-support\sfk echo -spat \x20 \x20  [Green] Everything finished^^!
+if /i %failed% EQU %nof% (support\sfk echo -spat \x20 \x20  [Red] All downloads failed, please check your connection!) && (goto:miniskip)
+if /i %failed% GTR 0 (support\sfk echo -spat \x20 \x20  [Yellow] Finished, but with errors.) else (support\sfk echo -spat \x20 \x20  [Green] Everything finished^^!)
 echo.
 echo		You can find the patched file(s) in the "copy-to-device" folder.
 echo		Install it/them with a WAD manager.
+:miniskip
 echo.
 echo		Press any key to close this patcher.
 pause >NUL
