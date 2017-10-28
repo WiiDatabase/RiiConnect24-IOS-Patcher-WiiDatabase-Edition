@@ -3,7 +3,7 @@ SETLOCAL ENABLEDELAYEDEXPANSION
 :top
 CLS
 COLOR 1F
-set currentversion=v1.0.2
+set currentversion=v1.0.3
 set header=echo			RiiConnect24 IOS Patcher %currentversion% by WiiDatabase.de
 mode con cols=85 lines=30
 TITLE RiiConnect24 IOS Patcher %currentversion%
@@ -145,7 +145,7 @@ goto:startdownload
 :download
 :: Downloading base WAD
 start /min/wait Support\nusd.exe %titleid% %titleversion% packwad
-if exist titles\%titleid%\%titleversion%\%titleid%-NUS-v%titleversion%.wad move /y titles\%titleid%\%titleversion%\%titleid%-NUS-v%titleversion%.wad tmp\%name%.wad
+if exist titles\%titleid%\%titleversion%\%titleid%-NUS-v%titleversion%.wad move /y titles\%titleid%\%titleversion%\%titleid%-NUS-v%titleversion%.wad tmp\%name%.wad >NUL
 
 if exist titles\%titleid% rd /s /q titles\%titleid%
 if exist tmp\%name%.wad goto:checkdownload
